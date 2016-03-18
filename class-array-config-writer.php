@@ -57,13 +57,13 @@ class Array_Config_Writer {
     public function __construct($config_file , $variable_name = '\$config' ) 
     {
         $this->_file = $config_file ;
-        echo $variable_name;
         $this->setVariableName($variable_name );
         
         if ( ! file_exists($this->_file))
         {
             //throw new Exception('Config Write Error: Config file doesnt exists ' . $this->_file);
             $this->_lastError = 'Config Write Error: Config file doesnt exists ' . $this->_file ;
+            return ;
         }
         $this->_fileContent =  file_get_contents( $this->_file ) ;
         
