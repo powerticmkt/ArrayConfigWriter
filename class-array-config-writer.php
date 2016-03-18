@@ -178,6 +178,7 @@ class Array_Config_Writer {
         }
         
         $this->_variable = $name;
+        return $this;
     }
 
     /**
