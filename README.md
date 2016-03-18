@@ -81,7 +81,7 @@ or
     $congig_writer->setVariableName('db');
     $congig_writer->write( array( default' , 'hostname' ) , 'remotehost' );
 
-Now every write() call will serch for $db variable 
+Now every write() call will search for $db variable 
 
 
 
