@@ -43,7 +43,7 @@ now  [PATH_TO_SITE_FILES]/config/config.php is
         | than english.
         |
         */
-        $config['language']	= 'english';
+        $config['language']	= 'french';
         
     
    
