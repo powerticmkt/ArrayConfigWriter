@@ -32,22 +32,21 @@ Lets say the path to config file is  [PATH_TO_SITE_FILES]/config/config.php
 And thats all. The value of $config['language']	in the [PATH_TO_SITE_FILES]/config/config.php will be updated to 'french'
 
 now  [PATH_TO_SITE_FILES]/config/config.php is 
-  /*
-    |--------------------------------------------------------------------------
-    | Default Language
-    |--------------------------------------------------------------------------
-    |
-    | This determines which set of language files should be used. Make sure
-    | there is an available translation if you intend to use something other
-    | than english.
-    |
-    */
-    $config['language']	= 'english';
-    
+
+      /*
+        |--------------------------------------------------------------------------
+        | Default Language
+        |--------------------------------------------------------------------------
+        |
+        | This determines which set of language files should be used. Make sure
+        | there is an available translation if you intend to use something other
+        | than english.
+        |
+        */
+        $config['language']	= 'english';
+        
     
    
-    
-
 WHat if the $config array in '[PATH_TO_SITE_FILES]/config/config.php file does not have 'language' index?
  -Well the the writer will create a new index of 'language'
 
