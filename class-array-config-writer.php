@@ -148,7 +148,8 @@ class Array_Config_Writer {
         $mark = "{$prefix}" ;
         // we can update multi dementional
         $indece = is_array($index)? $index : array( $index ) ;
-       
+        $comment_str = '' ;
+        
         foreach ( $indece as $index => $i)
         {
             $regex .= '\[\s*(\'|\")(' . $i . ')*(\'|\")\s*\]' ;
@@ -177,7 +178,7 @@ class Array_Config_Writer {
             if(is_array($comments) && count($comments) > 0 )
             {
                 // add the comment 
-                $comment_str = '/**' ;
+                $comment_str .= '/**' ;
                 $comment_str .= "\n" ;
                 foreach ($comments as $line)
                 {
@@ -205,6 +206,8 @@ class Array_Config_Writer {
      * Update the variable name of the array config
      * 
      * @param string $name
+     * 
+     * @return Array_Config_Writer for method chaining
      */
     public function setFilename($name = null)
     {
@@ -217,6 +220,8 @@ class Array_Config_Writer {
      * // actually we expect someting like '\$config' but user migt just provide 'config'
      * 
      * @param string $name
+     * 
+     * @return Array_Config_Writer
      */
     public function setVariableName($name = null)
     {
@@ -232,6 +237,8 @@ class Array_Config_Writer {
         }
         
         $this->_variable = $name;
+        
+        return $this;
     }
 
     /**
