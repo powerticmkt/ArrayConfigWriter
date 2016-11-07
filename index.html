@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Array Config Writer by hollax</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Array Config Writer</h1>
+      <h2 class="project-tagline">Update php array element permanently in a php file. This library allows you update specific php array values by specifying the variable name of the array and the index to update. s</h2>
+      <a href="https://github.com/hollax/ArrayConfigWriter" class="btn">View on GitHub</a>
+      <a href="https://github.com/hollax/ArrayConfigWriter/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/hollax/ArrayConfigWriter/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="array-config-writer" class="anchor" href="#array-config-writer" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Array Config Writer</h1>
+
+<p>This php library can be used to update array values in php a file.
+Some applications use php array to store configuration values and to update the values,
+users will have to manually open the configuration file and update the value.</p>
+
+<p>This library makes the task of updating the array easy. You programmatically update 
+the values of the array.</p>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h2>
+
+<ul>
+<li>Download the library and extract it in a folder of your application. The folder choice depends on your application.</li>
+</ul>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
+
+<ul>
+<li>Include the class library to be available for usage <code>require_once 'class-array-config-writer.php';</code>
+</li>
+<li>Create an instance of  <code>Array_Config_Writer</code> class for the file that holds the php array we want to update</li>
+</ul>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1">    <span class="pl-smi">$config_writer</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">Array_Config_Writer</span>(<span class="pl-smi">$config_file</span>, <span class="pl-smi">$variable_name</span> , <span class="pl-smi">$auto_save</span> );</span></pre></div>
+
+<p>Where :</p>
+
+<ul>
+<li>
+<strong>$config_file</strong> (string) : The absolute path to the file where the array is place </li>
+<li>
+<strong>$variable_name</strong> (string) : The variable name of the array we want to update </li>
+<li>
+<strong>$auto_save</strong> (boolean) : Whether to automatically save the changes after the operation</li>
+</ul>
+
+<p>Supported variable Styles:</p>
+
+<ul>
+<li><code>Single index $config[ 'key'] = 'value' ;</code></li>
+<li><code>Multi dimensional $config['key1']['key2'] = 'value';</code></li>
+</ul>
+
+<p>You can not use the library to update something like <code>$config = array( 'key' =&gt; 'value' );</code></p>
+
+<p><strong>Notes:</strong> </p>
+
+<ul>
+<li>The library expect the variable to be indexed </li>
+<li>The file can have other variables aside our target variable</li>
+</ul>
+
+<p>Now you can start updating the index of the array like this </p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1">    <span class="pl-smi">$config_writer</span><span class="pl-k">-&gt;</span>write(<span class="pl-s"><span class="pl-pds">'</span>key<span class="pl-pds">'</span></span> , <span class="pl-c1">value</span> );</span></pre></div>
+
+<p><strong>Note:</strong> </p>
+
+<ul>
+<li>You can set value to any php variable type </li>
+<li>The library treats numeric index as it is. Meaning '21' is different from 21</li>
+</ul>
+
+<h2>
+<a id="examples" class="anchor" href="#examples" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Examples</h2>
+
+<p><strong>PHP File</strong> config.php</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1">    <span class="pl-c">/*</span></span>
+<span class="pl-s1"><span class="pl-c">    |--------------------------------------------------------------------------</span></span>
+<span class="pl-s1"><span class="pl-c">    | Site Name</span></span>
+<span class="pl-s1"><span class="pl-c">    |--------------------------------------------------------------------------</span></span>
+<span class="pl-s1"><span class="pl-c">    |</span></span>
+<span class="pl-s1"><span class="pl-c">    | </span></span>
+<span class="pl-s1"><span class="pl-c">    |</span></span>
+<span class="pl-s1"><span class="pl-c">    */</span></span>
+<span class="pl-s1">    <span class="pl-smi">$config</span>[ <span class="pl-s"><span class="pl-pds">'</span>site_name<span class="pl-pds">'</span></span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>Example Site<span class="pl-pds">'</span></span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"></span>
+<span class="pl-s1">    <span class="pl-c">/*</span></span>
+<span class="pl-s1"><span class="pl-c">    |--------------------------------------------------------------------------</span></span>
+<span class="pl-s1"><span class="pl-c">    |  Enable caching</span></span>
+<span class="pl-s1"><span class="pl-c">    |-------------------==-------------------------------------------------------</span></span>
+<span class="pl-s1"><span class="pl-c">    |</span></span>
+<span class="pl-s1"><span class="pl-c">    |</span></span>
+<span class="pl-s1"><span class="pl-c">    */</span></span>
+<span class="pl-s1">    <span class="pl-smi">$config</span>[ <span class="pl-s"><span class="pl-pds">'</span>enable_caching<span class="pl-pds">'</span></span>] <span class="pl-k">=</span> <span class="pl-c1">true</span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">    <span class="pl-c">/*</span></span>
+<span class="pl-s1"><span class="pl-c">    |--------------------------------------------------------------------------</span></span>
+<span class="pl-s1"><span class="pl-c">    |  Custom Array</span></span>
+<span class="pl-s1"><span class="pl-c">    |-------------------==-------------------------------------------------------</span></span>
+<span class="pl-s1"><span class="pl-c">    |</span></span>
+<span class="pl-s1"><span class="pl-c">    |</span></span>
+<span class="pl-s1"><span class="pl-c">    */</span></span>
+<span class="pl-s1">    <span class="pl-smi">$config</span>[ <span class="pl-s"><span class="pl-pds">'</span>message<span class="pl-pds">'</span></span>] <span class="pl-k">=</span> <span class="pl-c1">array</span>(</span>
+<span class="pl-s1">                                <span class="pl-s"><span class="pl-pds">'</span>title<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>Welcome<span class="pl-pds">'</span></span> ,</span>
+<span class="pl-s1">                                 <span class="pl-s"><span class="pl-pds">'</span>body<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>Thanks for your interest in the library<span class="pl-pds">'</span></span></span>
+<span class="pl-s1">                            );</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"></span>
+<span class="pl-s1">    <span class="pl-c">/*</span></span>
+<span class="pl-s1"><span class="pl-c">    |--------------------------------------------------------------------------</span></span>
+<span class="pl-s1"><span class="pl-c">    |  Another Config Variable for the database </span></span>
+<span class="pl-s1"><span class="pl-c">    |-------------------==-------------------------------------------------------</span></span>
+<span class="pl-s1"><span class="pl-c">    |</span></span>
+<span class="pl-s1"><span class="pl-c">    |</span></span>
+<span class="pl-s1"><span class="pl-c">    */</span></span>
+<span class="pl-s1">    <span class="pl-smi">$db</span>[ <span class="pl-s"><span class="pl-pds">'</span>database<span class="pl-pds">'</span></span>] <span class="pl-k">=</span>  <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>;</span>
+<span class="pl-s1">    <span class="pl-smi">$db</span>[ <span class="pl-s"><span class="pl-pds">'</span>username<span class="pl-pds">'</span></span>] <span class="pl-k">=</span>  <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>;</span></pre></div>
+
+<p>Create an instance of the library</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1">    <span class="pl-smi">$config_writer</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">Array_Config_Writer</span>( <span class="pl-c1">APP_PATH</span><span class="pl-k">.</span><span class="pl-s"><span class="pl-pds">'</span>config/config.php<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>config<span class="pl-pds">'</span></span> );</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">    <span class="pl-c">// update the site name</span></span>
+<span class="pl-s1"></span>
+<span class="pl-s1">    <span class="pl-smi">$config_writer</span><span class="pl-k">-&gt;</span>write(<span class="pl-s"><span class="pl-pds">'</span>site_name<span class="pl-pds">'</span></span> , <span class="pl-s"><span class="pl-pds">"</span>New Site Name' );</span></span></pre></div>
+
+<h2>
+<a id="method-chaining" class="anchor" href="#method-chaining" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Method Chaining</h2>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1">    <span class="pl-smi">$config_writer</span><span class="pl-k">-&gt;</span>write(<span class="pl-s"><span class="pl-pds">'</span>site_name<span class="pl-pds">'</span></span> , <span class="pl-s"><span class="pl-pds">"</span>New Site Name' )-&gt;write('enable_caching' , false );</span></span></pre></div>
+
+<p>To update the <code>'message'</code> index which has array has value</p>
+
+<ul>
+<li>First get the current value </li>
+</ul>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1">    <span class="pl-smi">$meesage</span> <span class="pl-k">=</span> <span class="pl-smi">$config</span>[<span class="pl-s"><span class="pl-pds">'</span>message<span class="pl-pds">'</span></span>];</span></pre></div>
+
+<ul>
+<li>Then change its value(s) </li>
+</ul>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1">    <span class="pl-smi">$message</span>[<span class="pl-s"><span class="pl-pds">'</span>title<span class="pl-pds">'</span></span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>My New title<span class="pl-pds">'</span></span> ;</span>
+<span class="pl-s1">    <span class="pl-smi">$message</span>[<span class="pl-s"><span class="pl-pds">'</span>body<span class="pl-pds">'</span></span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>New message body<span class="pl-pds">'</span></span> ;</span></pre></div>
+
+<ul>
+<li>Or completely set new array for the message index</li>
+</ul>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1">    <span class="pl-c">// assuming the admin sent a form, Just an example, you should validate user post! :d</span></span>
+<span class="pl-s1">    <span class="pl-smi">$message</span> <span class="pl-k">=</span> <span class="pl-smi">$_POST</span>[<span class="pl-s"><span class="pl-pds">'</span>message<span class="pl-pds">'</span></span>];</span></pre></div>
+
+<ul>
+<li>Save it with the library </li>
+</ul>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1">    <span class="pl-smi">$config_writer</span><span class="pl-k">-&gt;</span>write(<span class="pl-s"><span class="pl-pds">'</span>message<span class="pl-pds">'</span></span> , <span class="pl-smi">$message</span> );</span></pre></div>
+
+<h2>
+<a id="disable-auto-save-option" class="anchor" href="#disable-auto-save-option" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Disable Auto Save Option</h2>
+
+<p>You can disable auto save option for some reason</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1">    <span class="pl-c">// note the third argument</span></span>
+<span class="pl-s1">    <span class="pl-smi">$config_writer</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">Array_Config_Writer</span>( <span class="pl-c1">APP_PATH</span><span class="pl-k">.</span><span class="pl-s"><span class="pl-pds">'</span>config/config.php<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>config<span class="pl-pds">'</span></span> , <span class="pl-c1">false</span> );</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">    <span class="pl-smi">$config_writer</span><span class="pl-k">-&gt;</span>write(<span class="pl-s"><span class="pl-pds">'</span>site_name<span class="pl-pds">'</span></span> , <span class="pl-s"><span class="pl-pds">"</span>New Site Name' )-&gt;write('enable_caching' , false );</span></span></pre></div>
+
+<h2>
+<a id="manually-call-the-save-method" class="anchor" href="#manually-call-the-save-method" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Manually call the save method</h2>
+
+<p>If you disable the auto save functionality, you will have to manually call <code>save()</code> once you are done with <code>write()</code></p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1">    <span class="pl-smi">$config_writer</span><span class="pl-k">-&gt;</span>save();</span></pre></div>
+
+<h2>
+<a id="update-multiple-variable-with-single-library-instance" class="anchor" href="#update-multiple-variable-with-single-library-instance" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Update Multiple Variable With Single Library Instance</h2>
+
+<p>Lets say the <strong>config.php</strong> file has another variable aside <code>$config</code> that needs to be updated
+If you check the example <strong>config.php</strong> file there is another variable named <code>$bd</code> 
+We can update this variable also without creating new instance of the library to target <code>$db</code></p>
+
+<p><strong>Switch target variable</strong></p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1">     <span class="pl-smi">$config_writer</span><span class="pl-k">-&gt;</span>setVariableName(<span class="pl-s"><span class="pl-pds">'</span>db<span class="pl-pds">'</span></span>);</span></pre></div>
+
+<p>Now the subsequent calls to <code>write()</code> method will replace index of <code>$db</code> variable keeping the previous changes to <code>config</code> variable intact</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1">    <span class="pl-smi">$config_writer</span><span class="pl-k">-&gt;</span>write(<span class="pl-s"><span class="pl-pds">'</span>database<span class="pl-pds">'</span></span> , <span class="pl-s"><span class="pl-pds">'</span>my_database<span class="pl-pds">'</span></span> );</span>
+<span class="pl-s1">    <span class="pl-smi">$config_writer</span><span class="pl-k">-&gt;</span>write(<span class="pl-s"><span class="pl-pds">'</span>user<span class="pl-pds">'</span></span> , <span class="pl-s"><span class="pl-pds">'</span>db_user<span class="pl-pds">'</span></span> );</span></pre></div>
+
+<h2>
+<a id="dealing-with-index-that-does-not-already-exist" class="anchor" href="#dealing-with-index-that-does-not-already-exist" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Dealing WIth Index That Does Not Already Exist</h2>
+
+<p>It is possible that the index you passed to <code>write()</code> method does't exist yet, you can tell library 
+to create new array index if the index does not already exist with the third argument of <code>write()</code> method</p>
+
+<p>Check the signature of the write method </p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1">    <span class="pl-k">public</span> <span class="pl-k">function</span> <span class="pl-en">write</span>( <span class="pl-smi">$index</span>  <span class="pl-k">=</span> <span class="pl-c1">null</span>, <span class="pl-smi">$replacement</span> <span class="pl-k">=</span> <span class="pl-c1">null</span> , <span class="pl-smi">$write_method</span> <span class="pl-k">=</span> <span class="pl-c1">self</span><span class="pl-k">::</span><span class="pl-c1">CREATE_OR_UPDATE</span> , <span class="pl-smi">$comments</span> <span class="pl-k">=</span> <span class="pl-c1">null</span> )</span></pre></div>
+
+<p>Where :</p>
+
+<ul>
+<li>
+<code>$index</code> (mixed) : The index of of the array to update , you can use array as index to update multi dimensional array</li>
+<li>
+<code>$replacement</code> (mixed) : The new value for the index</li>
+<li>
+<p><code>$write_method</code> (int) : One of the three constants: </p>
+
+<ul>
+<li>
+<code>Array_Config_Writer::CREATE_OR_UPDATE</code> : This makes the library update the value of the specified index or create new index if specified index not found</li>
+<li>
+<code>Array_Config_Writer::SKIP_IF_EXIST</code> : This will make the library skip updating or creating the index if the index actually exists(can be used if you don't want to override user setting)</li>
+<li>
+<code>Array_Config_Writer::SKIP_CREATE_IF_NOT_EXIST</code> : This make the library skip creating new index if not already exist. But will update if exist.</li>
+</ul>
+</li>
+<li><p><code>$comments</code> (array) : Optionally add comment when creating new index. Each value of the array will be placed on a separate line</p></li>
+</ul>
+
+<p>By default the library will create new index if not exists</p>
+
+<p>Try to update index name <strong>new_index</strong> which does not exist yet</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1">     <span class="pl-smi">$config_writer</span><span class="pl-k">-&gt;</span>write(<span class="pl-s"><span class="pl-pds">'</span>new_index<span class="pl-pds">'</span></span> , <span class="pl-s"><span class="pl-pds">'</span>new index value<span class="pl-pds">'</span></span> );</span></pre></div>
+
+<p>The config file will now change to </p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1">    <span class="pl-k">**</span><span class="pl-c1">PHP</span> <span class="pl-c1">File</span><span class="pl-k">**</span> <span class="pl-c1">config</span><span class="pl-k">.</span><span class="pl-c1">php</span></span>
+<span class="pl-s1"></span>
+<span class="pl-s1">    <span class="pl-c">/*</span></span>
+<span class="pl-s1"><span class="pl-c">    |--------------------------------------------------------------------------</span></span>
+<span class="pl-s1"><span class="pl-c">    | Site need installation</span></span>
+<span class="pl-s1"><span class="pl-c">    |--------------------------------------------------------------------------</span></span>
+<span class="pl-s1"><span class="pl-c">    |</span></span>
+<span class="pl-s1"><span class="pl-c">    | </span></span>
+<span class="pl-s1"><span class="pl-c">    |</span></span>
+<span class="pl-s1"><span class="pl-c">    */</span></span>
+<span class="pl-s1">    <span class="pl-smi">$config</span>[ <span class="pl-s"><span class="pl-pds">'</span>site_name<span class="pl-pds">'</span></span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>New Site Name<span class="pl-pds">"</span></span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"></span>
+<span class="pl-s1">    <span class="pl-c">/*</span></span>
+<span class="pl-s1"><span class="pl-c">    |--------------------------------------------------------------------------</span></span>
+<span class="pl-s1"><span class="pl-c">    |  Enable caching</span></span>
+<span class="pl-s1"><span class="pl-c">    |-------------------==-------------------------------------------------------</span></span>
+<span class="pl-s1"><span class="pl-c">    |</span></span>
+<span class="pl-s1"><span class="pl-c">    |</span></span>
+<span class="pl-s1"><span class="pl-c">    */</span></span>
+<span class="pl-s1">    <span class="pl-smi">$config</span>[ <span class="pl-s"><span class="pl-pds">'</span>enable_caching<span class="pl-pds">'</span></span>] <span class="pl-k">=</span> <span class="pl-c1">false</span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">    <span class="pl-c">/*</span></span>
+<span class="pl-s1"><span class="pl-c">    |--------------------------------------------------------------------------</span></span>
+<span class="pl-s1"><span class="pl-c">    |  Custom Array</span></span>
+<span class="pl-s1"><span class="pl-c">    |-------------------==-------------------------------------------------------</span></span>
+<span class="pl-s1"><span class="pl-c">    |</span></span>
+<span class="pl-s1"><span class="pl-c">    |</span></span>
+<span class="pl-s1"><span class="pl-c">    */</span></span>
+<span class="pl-s1">    <span class="pl-smi">$config</span>[ <span class="pl-s"><span class="pl-pds">'</span>message<span class="pl-pds">'</span></span>] <span class="pl-k">=</span> <span class="pl-c1">array</span>(</span>
+<span class="pl-s1">                                <span class="pl-s"><span class="pl-pds">'</span>title<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>My New title<span class="pl-pds">'</span></span> ,</span>
+<span class="pl-s1">                                 <span class="pl-s"><span class="pl-pds">'</span>body<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>New message body<span class="pl-pds">'</span></span></span>
+<span class="pl-s1">                            );</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"></span>
+<span class="pl-s1">    <span class="pl-c">/*</span></span>
+<span class="pl-s1"><span class="pl-c">    |--------------------------------------------------------------------------</span></span>
+<span class="pl-s1"><span class="pl-c">    |  Another Config Variable for the database </span></span>
+<span class="pl-s1"><span class="pl-c">    |-------------------==-------------------------------------------------------</span></span>
+<span class="pl-s1"><span class="pl-c">    |</span></span>
+<span class="pl-s1"><span class="pl-c">    |</span></span>
+<span class="pl-s1"><span class="pl-c">    */</span></span>
+<span class="pl-s1">    <span class="pl-smi">$db</span>[ <span class="pl-s"><span class="pl-pds">'</span>database<span class="pl-pds">'</span></span>] <span class="pl-k">=</span>  <span class="pl-s"><span class="pl-pds">'</span>my_database<span class="pl-pds">'</span></span>;</span>
+<span class="pl-s1">    <span class="pl-smi">$db</span>[ <span class="pl-s"><span class="pl-pds">'</span>username<span class="pl-pds">'</span></span>] <span class="pl-k">=</span>  <span class="pl-s"><span class="pl-pds">'</span>db_user<span class="pl-pds">'</span></span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">    <span class="pl-c">/**</span></span>
+<span class="pl-s1"><span class="pl-c">    * </span></span>
+<span class="pl-s1"><span class="pl-c">    */</span></span>
+<span class="pl-s1">    <span class="pl-smi">$config</span>[<span class="pl-s"><span class="pl-pds">'</span>new_index<span class="pl-pds">'</span></span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>new index value<span class="pl-pds">'</span></span>;</span></pre></div>
+
+<p>If we had provided <code>$comment</code> array</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1">    <span class="pl-smi">$comments</span> <span class="pl-k">=</span> [</span>
+<span class="pl-s1">        <span class="pl-s"><span class="pl-pds">'</span>line one<span class="pl-pds">'</span></span>,</span>
+<span class="pl-s1">        <span class="pl-s"><span class="pl-pds">'</span>line two<span class="pl-pds">'</span></span>,</span>
+<span class="pl-s1">        <span class="pl-s"><span class="pl-pds">'</span>line three<span class="pl-pds">'</span></span></span>
+<span class="pl-s1">    ];</span>
+<span class="pl-s1">    <span class="pl-smi">$config_writer</span><span class="pl-k">-&gt;</span>write(<span class="pl-s"><span class="pl-pds">'</span>new_index<span class="pl-pds">'</span></span> , <span class="pl-s"><span class="pl-pds">'</span>new index value<span class="pl-pds">'</span></span> , <span class="pl-c1">Array_Config_Writer</span><span class="pl-k">::</span><span class="pl-c1">CREATE_OR_UPDATE</span> , <span class="pl-smi">$comments</span> );</span></pre></div>
+
+<p>The new index would be </p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1">    <span class="pl-c">/**</span></span>
+<span class="pl-s1"><span class="pl-c">    * line one</span></span>
+<span class="pl-s1"><span class="pl-c">    * line two</span></span>
+<span class="pl-s1"><span class="pl-c">    * line three</span></span>
+<span class="pl-s1"><span class="pl-c">    */</span></span>
+<span class="pl-s1">    <span class="pl-smi">$config</span>[<span class="pl-s"><span class="pl-pds">'</span>new_index<span class="pl-pds">'</span></span>] <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>new index value<span class="pl-pds">'</span></span> ;</span></pre></div>
+
+<h2>
+<a id="update-multi-dimensional-array" class="anchor" href="#update-multi-dimensional-array" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Update Multi Dimensional Array</h2>
+
+<p>To update array index of this format '$config['db']['username']<code>, you can update the username  by specifying array as first argument to</code>write()`</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1">    <span class="pl-smi">$config_writer</span><span class="pl-k">-&gt;</span>write( [ <span class="pl-s"><span class="pl-pds">'</span>db<span class="pl-pds">'</span></span> , <span class="pl-s"><span class="pl-pds">'</span>username<span class="pl-pds">'</span></span>] , <span class="pl-s"><span class="pl-pds">'</span>new db username<span class="pl-pds">'</span></span> );</span></pre></div>
+
+<h2>
+<a id="dealing-with-errors" class="anchor" href="#dealing-with-errors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Dealing With Errors</h2>
+
+<p>It is possible for the update operation not to be success, this could be that </p>
+
+<ul>
+<li>The file you are try to update does't exist</li>
+<li>You did not set the variable name of the array</li>
+<li>You did not provide valid index to update the index to update</li>
+</ul>
+
+<p>To check if any error occur at any point use <code>hasError()</code> 
+To get the last error that, use <code>getLastError()</code> </p>
+
+<h2>
+<a id="class-public-methods" class="anchor" href="#class-public-methods" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Class Public Methods</h2>
+
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Arguments</th>
+<th>return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>__construct</code></td>
+<td>The class constructor takes 3 arguments</td>
+<td>1.(string): File to update 2.(string) The target variable name 3. (boolean) Whether to save the file after update</td>
+<td>Array_Config_write</td>
+</tr>
+<tr>
+<td><code>setAutoSave</code></td>
+<td>Set the auto save option</td>
+<td>(boolean) Whether to automatically save the update</td>
+<td>Array_Config_writer</td>
+</tr>
+<tr>
+<td><code>setVariableName</code></td>
+<td>Set the name of the variable for library to update</td>
+<td>(string) variable name</td>
+<td>Array_Config_writer</td>
+</tr>
+<tr>
+<td><code>setFilename</code></td>
+<td>Set the name of the file for library to save the update to, This is the by default the same file where the variable is searched</td>
+<td>(string) The absolute path to file</td>
+<td>Array_Config_writer</td>
+</tr>
+<tr>
+<td><code>write</code></td>
+<td>Update array index. Takes 4 arguments</td>
+<td>1. (mixed): Index to search for. 2. (mixed): New value for the searched index. 3. (int): Write method. Should be Array_Config_Writer::CREATE_OR_UPDAT or Array_Config_Writer::SKIP_IF_EXIST<code>or</code>Array_Config_Writer::SKIP_CREATE_IF_NOT_EXIST` : This make the library skip creating new index if not already exist. But will update if exist. 4. (array) : Optionally provide comment to be added if the library create new index, Each element is placed on its own line</td>
+<td>Array_Config_writer</td>
+</tr>
+<tr>
+<td><code>save</code></td>
+<td>Save the update to file</td>
+<td>none</td>
+<td>Array_Config_writer</td>
+</tr>
+<tr>
+<td><code>hasError</code></td>
+<td>Check if any error occur</td>
+<td>none</td>
+<td>boolean</td>
+</tr>
+<tr>
+<td><code>getLastError</code></td>
+<td>Get the last error</td>
+<td>none</td>
+<td>string</td>
+</tr>
+</tbody>
+</table>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/hollax/ArrayConfigWriter">Array Config Writer</a> is maintained by <a href="https://github.com/hollax">hollax</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
