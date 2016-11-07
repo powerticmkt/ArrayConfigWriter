@@ -1,90 +1,127 @@
-# array-config-writer
-Write and update config item. This library was inspired by a CodeIgniter project when there was a need to permanently update the configuration values instead of setting configuration in every request.
+# Array Config Writer 
 
-for instance, some of the codeigniter config file has $config array with different key and value-pairs as options.
+This php library can be used to update array values in php a file.
+Some applications use php array to store configuration values and to update the values
+users will have to manually open the configuration file and update the value.
 
-lets say we want to update the default language of the config 
+This library makes the task of updating the array easy. You programmatically update 
+the values of the array.
+
+##Installation 
+
+* Download the library and extract it in a folder of your application. The folder choice depends on your application.
+
+
+##Usage
+* Include the class library to be available for usage `require_once 'class-array-config-writer.php';`
+* Create an instance of  `Array_Config_Writer` class for the file that holds the php array we want to update
+
+    $config_writer = new Array_Config_Writer($config_file, $variable_name , $auto_save );
+
+Where :
+
+* **$config_file** (string) : The absolute path to the file where the array is place 
+* **$variable_name** (string) : The variable name of the array we want to update 
+* **$auto_save** (boolean) : Whether to automatically save the changes after the operation
+
+Supported variable Styles:
+* `Single index $config[ 'key'] = 'value' ;`
+* `Multi dimensional $config['key1']['key2'] = 'value';`
+
+You can not use the library to update something like `$config = array( 'key' => 'value' );`
+
+**Notes:** 
+* The library expect the variable to be indexed 
+* The file can have other variables aside our target variable
+
+
+Now you can start updating the index of the array like this 
+
+    $config_writer->write('key' , value );
+
+**Note:** 
+* You can set value to any php variable type 
+* The library treats numeric index as it is. Meaning '21' is different from 21
+
+##Examples
+
+**PHP File** config.php
+
+```php
+    /*
+    |--------------------------------------------------------------------------
+    | Site Name
+    |--------------------------------------------------------------------------
+    |
+    | 
+    |
+    */
+    $config[ 'site_name'] = 'Example Site';
+
 
     /*
     |--------------------------------------------------------------------------
-    | Default Language
-    |--------------------------------------------------------------------------
+    |  Enable caching
+    |-------------------==-------------------------------------------------------
     |
-    | This determines which set of language files should be used. Make sure
-    | there is an available translation if you intend to use something other
-    | than english.
     |
     */
-    $config['language']	= 'english';
+    $config[ 'enable_caching'] = true;
+
+    /*
+    |--------------------------------------------------------------------------
+    |  Custom Array
+    |-------------------==-------------------------------------------------------
+    |
+    |
+    */
+    $config[ 'message'] = array(
+                                'title' => 'Welcome' ,
+                                 'body' => 'Thanks for your interest in the library'
+                            );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    |  Another Config Variable for the database 
+    |-------------------==-------------------------------------------------------
+    |
+    |
+    */
+    $db[ 'database'] =  '';
+    $db[ 'username'] =  '';
+```
+
+Create an instance of the library
+
+    $config_writer = new Array_Config_Writer( APP_PATH.'config/config.php', 'config' );
+     
+    // update the site name
+
+    $config_writer->write('site_name' , "New Site Name' );
+
+## Method chaining 
+
+    $config_writer->write('site_name' , "New Site Name' )->write('enable_caching' , false );
+
+
+To update the `'message'` index which has array has value
+
+* First get the current value 
+
+    $meesage = $config['message'];
+
+* Then change its value(s) 
     
-    $config['compress_output']	= false ;
+    $message['title'] = 'My New title' ;
+    $message['body'] = 'New message body' ;
 
-Lets say the path to config file is  [PATH_TO_SITE_FILES]/config/config.php
-
-//include the Writer
-
-    require_once PATH_TO_SITE_FILES . 'libraries/array_config_writer/class-array-config-writer.php';
-
-    $congig_writer = new Array_Config_Writer( '[PATH_TO_SITE_FILES]/config/config.php' , 'config' );
-
-    $congig_writer->write( 'language' , 'french' ) ;
-
-And thats all. The value of $config['language']	in the [PATH_TO_SITE_FILES]/config/config.php will be updated to 'french'
-
-now  [PATH_TO_SITE_FILES]/config/config.php is 
-
-      /*
-        |--------------------------------------------------------------------------
-        | Default Language
-        |--------------------------------------------------------------------------
-        |
-        | This determines which set of language files should be used. Make sure
-        | there is an available translation if you intend to use something other
-        | than english.
-        |
-        */
-        $config['language']	= 'french';
-        
+* Or completely set new array for the message index
     
-   
-WHat if the $config array in '[PATH_TO_SITE_FILES]/config/config.php file does not have 'language' index?
- -Well the the writer will create a new index of 'language'
+    // assuming the admin sent a form, Just an example, you should validate user post! :d
+    $message = $_POST['message'];
 
-if you set the third parameter of write() method to true and the 'language' index already exists the writer will skip updating the index value. This can be useful on application upgrades
+* Save it with the library 
 
-Awesome right?
-
-
-Features 
-
-=> Method chaining is allowed 
-
-    $congig_writer->write( 'language' , 'french' )->write('compress_output' , true ) ;
-
-
-    
-=> if your config varible is multi dimentional array like 
-    $db['default']['hostname'] = 'localhost' 
-    
-You can update the 'hostname' index like this 
- 1 . You either instatiate new class 
- 
-     $congig_writer = new Array_Config_Writer( '[PATH_TO_SITE_FILES]/config/database.php' , 'db' );
-  
-     $congig_writer->write( array( default' , 'hostname' ) , 'remotehost' );
-   
-or 
-
-2. Update the config variable name for the config writer if  '[PATH_TO_SITE_FILES]/config/config.php' has  $db['default']['hostname'] index 
-    
-    $congig_writer->setVariableName('db');
-    $congig_writer->write( array( default' , 'hostname' ) , 'remotehost' );
-
-Now every write() call will search for $db variable 
-
-
-
-
-
-   
+    $config_writer->write('message' , $message );
 
