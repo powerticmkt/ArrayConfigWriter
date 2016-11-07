@@ -4,7 +4,7 @@
 Copyright 2016 Wakeel Ogunsanya
 Licensed under GPLv2 or above
 
-Version 1.2.0
+Version 1.2.1
 */
 
 class Array_Config_Writer {
@@ -163,14 +163,27 @@ class Array_Config_Writer {
         // add a mark in case config item doesnt exists
         $mark = "{$prefix}" ;
         // we can update multi dementional
-        $indece = is_array($index)? $index : array( $index ) ;
+        $indices = is_array($index)? $index : array( $index ) ;
         $comment_str = '' ;
         
-        foreach ( $indece as $index => $i)
+        foreach ( $indices as  $i)
         {
-            $regex .= '\[\s*(\'|\")(' . $i . ')*(\'|\")\s*\]' ;
-            $mark .= "['{$i}']" ;
+            $is_int = is_int($i) ;
+             // we make sure we dont chenge the index type if its numeric
+            $new_item_index = $is_int? $i : "'$i'" ;
+            // if the index is int, we dont need ' or "" to be checked in the regex
+            $regex .= '\[\s*';
+            $regex .= $is_int? '' : '(\'|\")' ;
+            $regex .=  '('.$i.')*';
+            $regex .= $is_int? '' : '(\'|\")';
+            $regex .= '\s*\]' ;
+            // Used before we seperated numeric index from string
+            //$regex .= '\[\s*(\'|\")(' . $i . ')*(\'|\")\s*\]' ;
+           
+            
+            $mark .= "[$new_item_index]" ;
         }
+       
         // closing
         $regex .= ')\s*=[^\;]*#' ; 
         $mark .= " = ";
@@ -212,7 +225,7 @@ class Array_Config_Writer {
                             $comment_str .= ' * ' . $line . "\n" ;
                         }
                         // close the comment
-                        $comment_str .= '*/'  . "\n";
+                        $comment_str .= '*/';
                     }
 
                      // lets try remove traling slash from the variable name since 
