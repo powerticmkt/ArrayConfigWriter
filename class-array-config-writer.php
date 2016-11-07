@@ -4,12 +4,25 @@
 Copyright 2016 Wakeel Ogunsanya
 Licensed under GPLv2 or above
 
-Version 1.1.0
+Version 1.2.1
 */
 
 class Array_Config_Writer {
     
-    
+    /**
+     * Skip updating the index if the index acctually exist
+     * 
+     * This will also create new index if not exist
+     */
+    const SKIP_IF_EXIST = 0;
+    /**
+     * Skip creating new index if the specified index is not found
+     */
+    const SKIP_CREATE_IF_NOT_EXIST = 1;
+    /**
+     * Update or create the index
+     */
+    const CREATE_OR_UPDATE = 2;
     /**
      * The config file to write
      * 
@@ -117,24 +130,27 @@ class Array_Config_Writer {
      *  will be array( 'default' , 'hostname' )
      *
      * @param mixed $replacement
-     * @param boolean $skip_if_exists Skip updating item if already exists
+     * @param boolean $write_method Skip updating item if already exists
      * @param null|array $comments Comment to add to the top of item (new item), each element
      *  will be placed oon a new line. *  is added before each line , meaning
      *  you dont have to put /** or *  unless you want it show 
+     * @throws Exception 
      * 
-     * @note you can not update existing item comment
+    * @note you can not update existing item comment
      *  
      * 
      * @return boolean
      * 
      */
-    public function write( $index  = null, $replacement = null , $skip_if_exists = FALSE , $comments = null)
+    public function write( $index  = null, $replacement = null , $write_method = self::CREATE_OR_UPDATE , $comments = null )
     {
         // error exists in the constructor?
         if($this->_lastError)
         {
             return $this;
         }
+        
+        $this->_fileContent = trim($this->_fileContent); 
         
         if(!$index)
         {
@@ -147,14 +163,27 @@ class Array_Config_Writer {
         // add a mark in case config item doesnt exists
         $mark = "{$prefix}" ;
         // we can update multi dementional
-        $indece = is_array($index)? $index : array( $index ) ;
+        $indices = is_array($index)? $index : array( $index ) ;
         $comment_str = '' ;
         
-        foreach ( $indece as $index => $i)
+        foreach ( $indices as  $i)
         {
-            $regex .= '\[\s*(\'|\")(' . $i . ')*(\'|\")\s*\]' ;
-            $mark .= "['{$i}']" ;
+            $is_int = is_int($i) ;
+             // we make sure we dont chenge the index type if its numeric
+            $new_item_index = $is_int? $i : "'$i'" ;
+            // if the index is int, we dont need ' or "" to be checked in the regex
+            $regex .= '\[\s*';
+            $regex .= $is_int? '' : '(\'|\")' ;
+            $regex .=  '('.$i.')*';
+            $regex .= $is_int? '' : '(\'|\")';
+            $regex .= '\s*\]' ;
+            // Used before we seperated numeric index from string
+            //$regex .= '\[\s*(\'|\")(' . $i . ')*(\'|\")\s*\]' ;
+           
+            
+            $mark .= "[$new_item_index]" ;
         }
+       
         // closing
         $regex .= ')\s*=[^\;]*#' ; 
         $mark .= " = ";
@@ -163,47 +192,78 @@ class Array_Config_Writer {
             
             // well config aleady exists 
             // may be is application upgrade :) we wouldnt wana overide user settings 
-            if( $skip_if_exists  )
+            if( $write_method == self::SKIP_IF_EXIST )
             {
                 return $this;
             }
             // update th content
             $this->_fileContent = preg_replace(   $regex ,  '$1$2 = ' .  var_export( $replacement , true ) , $this->_fileContent   ) ;
         }
-        else{
-            // new item here 
-            $mark .= var_export( $replacement , true ) . ' ;' ;
-            $mark .= "\n" ;
-           
-            if(is_array($comments) && count($comments) > 0 )
+        // config item doesnt exist yet create new index if reqyuired
+        else
+        {
+            switch ($write_method)
             {
-                // add the comment 
-                $comment_str .= '/**' ;
-                $comment_str .= "\n" ;
-                foreach ($comments as $line)
-                {
-                    $comment_str .= ' * ' . $line . "\n" ;
-                }
-                // close the comment
-                $comment_str .= '*/'  . "\n";
-            }
+                case self::SKIP_CREATE_IF_NOT_EXIST:
+                    return $this;
+                case self::CREATE_OR_UPDATE:
+                case self::SKIP_IF_EXIST:
             
-             // lets try remove traling slash from the variable name since 
-            // we are writing php here 
-            if ( substr($mark, 0 , 1) == '\\' )
-            {
-                $mark = substr($mark, 1 );
+                    // new item here 
+                    $mark .= var_export( $replacement , true ) . ' ;' ;
+                    $mark .= "\n" ;
+                    $mark .= "\n" ;
+                    
+                    // add comment if provided
+                    if(is_array($comments) && count($comments) > 0 )
+                    {
+                        //open comment 
+                        $comment_str .= '/**' ;
+                        $comment_str .= "\n" ;
+                        foreach ($comments as $line)
+                        {
+                            $comment_str .= ' * ' . $line . "\n" ;
+                        }
+                        // close the comment
+                        $comment_str .= '*/';
+                    }
+
+                     // lets try remove traling slash from the variable name since 
+                    // we are writing php here 
+                    if ( substr($mark, 0 , 1) == '\\' )
+                    {
+                        $mark = substr($mark, 1 );
+                    }
+                    
+                     // we have updated the index, the file will save automatically in the class shutdwon
+                    // we did this allow update multiple index by call write() method as manay times 
+                    // as required
+                    // 
+                   
+                    // check if the file has php closing tag
+                    if(substr($this->_fileContent, -2) === '?>' )
+                    {
+                        // remove the closing tag before adding our new item
+                        $this->_fileContent = substr($this->_fileContent, 0 , -2). "\n" . $comment_str . "\n"  . $mark . ' ?>' ;
+                    }
+                    else
+                    {
+                        $this->_fileContent = $this->_fileContent . "\n" . $comment_str . "\n"  . $mark . "\n" ;
+                    }
+                    break;
+                case self::SKIP_CREATE_IF_NOT_EXIST:
+                    return $this;
+                    default :
+                        throw new Exception('Class: '.__CLASS__ .' Method :'.__METHOD__.'third parameter is invalid. Use the class constant');
             }
-            // we have updated the index, the file will save automatically in the class shutdwon
-            // we did this allow update multiple index by call write() method as manay times 
-            // as required
-            $this->_fileContent = $this->_fileContent . "\n" . $comment_str . "\n"  . $mark . "\n" ;
         }
         return $this;
     }
     
     /**
-     * Update the variable name of the array config
+     * Update the file name of the array config
+     * 
+     * You will olnly do this to transfer the php file content to another file
      * 
      * @param string $name
      * 
@@ -226,7 +286,12 @@ class Array_Config_Writer {
     public function setVariableName($name = null)
     {
        
-       
+        if(!is_string($name))
+        {
+            $this->_lastError = 'Variable name not string: '. $name;
+            return $this;
+        }
+        
         if(substr($name, 1, 1 ) != '$')
         {
             $name = '$' . $name ;
@@ -271,8 +336,16 @@ class Array_Config_Writer {
         }
         return $this;
     }
-
     
+    /**
+     * Check if any error has occured
+     * 
+     * @return boolean
+     */
+    public function hasError()
+    {
+        return !empty($this->_lastError);
+    }
     /**
      * Get last error that occured
      * 
@@ -281,5 +354,16 @@ class Array_Config_Writer {
     public function getLastError()
     {
         return $this->_lastError;
+    }
+    
+    /**
+     * Set auto save option
+     * 
+     * @since 1.1.1
+     * @param boolean $option
+     */
+    public function setAutoSave($option = true)
+    {
+        $this->_autoSave = $option;
     }
 }
